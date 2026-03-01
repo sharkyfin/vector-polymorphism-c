@@ -3,11 +3,6 @@
 
 #include <stddef.h>
 
-typedef struct Complex {
-    double re;
-    double im;
-} Complex;
-
 typedef void (*BinaryOperation)(void* out, const void* a, const void* b);
 
 typedef struct FieldInfo {
@@ -21,5 +16,11 @@ typedef struct FieldInfo {
 
 const FieldInfo* getRealVector(void);
 const FieldInfo* getComplexVector(void);
+void fieldInfoShutdown(void);
+
+size_t complexValueSize(void);
+void complexMake(void* out, double re, double im);
+double complexGetRe(const void* value);
+double complexGetIm(const void* value);
 
 #endif

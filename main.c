@@ -106,8 +106,6 @@ int main(void) {
     vectorDestroy(a);
     vectorDestroy(b);
     vectorDestroy(c);
+    fieldInfoShutdown();
     return 0;
 }
-// Complex вынести в field_info.c
-// Ленивый getComplex / getReal
-// сделать тесты так будто это кольцо

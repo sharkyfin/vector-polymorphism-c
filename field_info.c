@@ -1,6 +1,43 @@
 #include "field_info.h"
+
 #include <stdio.h>
+#include <stdlib.h>
 #include <string.h>
+
+typedef struct Complex {
+    double re;
+    double im;
+} Complex;
+
+static FieldInfo* realInfo = NULL;
+static FieldInfo* complexInfo = NULL;
+
+size_t complexValueSize(void) {
+    return sizeof(Complex);
+}
+
+void complexMake(void* out, double re, double im) {
+    if (!out) {
+        return;
+    }
+    Complex* c = (Complex*)out;
+    c->re = re;
+    c->im = im;
+}
+
+double complexGetRe(const void* value) {
+    if (!value) {
+        return 0.0;
+    }
+    return ((const Complex*)value)->re;
+}
+
+double complexGetIm(const void* value) {
+    if (!value) {
+        return 0.0;
+    }
+    return ((const Complex*)value)->im;
+}
 
 static void genericZero(void* out, size_t elemSize) {
     memset(out, 0, elemSize);
@@ -49,25 +86,44 @@ static int complexRead(void* out) {
 }
 
 const FieldInfo* getRealVector(void) {
-    static const FieldInfo info = {
-        sizeof(double),
-        genericZero,
-        doubleAdd,
-        doubleMul,
-        doublePrint,
-        doubleRead
-    };
-    return &info;
+    if (!realInfo) {
+        realInfo = (FieldInfo*)malloc(sizeof(FieldInfo));
+        if (!realInfo) {
+            return NULL;
+        }
+
+        realInfo->elemSize = sizeof(double);
+        realInfo->zero = genericZero;
+        realInfo->add = doubleAdd;
+        realInfo->mul = doubleMul;
+        realInfo->print = doublePrint;
+        realInfo->read = doubleRead;
+    }
+
+    return realInfo;
 }
 
 const FieldInfo* getComplexVector(void) {
-    static const FieldInfo info = {
-        sizeof(Complex),
-        genericZero,
-        complexAdd,
-        complexMul,
-        complexPrint,
-        complexRead
-    };
-    return &info;
+    if (!complexInfo) {
+        complexInfo = (FieldInfo*)malloc(sizeof(FieldInfo));
+        if (!complexInfo) {
+            return NULL;
+        }
+
+        complexInfo->elemSize = sizeof(Complex);
+        complexInfo->zero = genericZero;
+        complexInfo->add = complexAdd;
+        complexInfo->mul = complexMul;
+        complexInfo->print = complexPrint;
+        complexInfo->read = complexRead;
+    }
+
+    return complexInfo;
+}
+
+void fieldInfoShutdown(void) {
+    free(realInfo);
+    free(complexInfo);
+    realInfo = NULL;
+    complexInfo = NULL;
 }
